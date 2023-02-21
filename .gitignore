@@ -1,5 +1,12 @@
 HELP.md
 target/
+.mvn/
+.idea/
+log/
+cron.txt
+mvnw
+mvnw.cmd
+show.iml
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
