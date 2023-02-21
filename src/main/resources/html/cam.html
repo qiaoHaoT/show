@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>间隔拍照</title>
+    <meta charset="utf-8">
+</head>
+<body>
+
+    <video id="video" width="500px" height="500px" autoplay="autoplay"></video> <br />
+    <input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia()" /> <br />
+    隔间时长：<input id="delayTime" value="1" placeholder="默认1秒" /> 秒<br/>
+    拍摄时长：<input id="photoTime" value="20" placeholder="默认20秒" /> 秒<br />
+    <button id="snap" onclick="takePhoto()">拍照</button><br />
+    <div id="img_div"></div>
+<!--    <canvas id="canvas" width="500px" height="500px"></canvas>-->
+<script>
+function getMedia() {
+    let constraints = {
+        video: {width: 500, height: 500, facingMode: { exact: "environment" }},
+        //video: {width: 500, height: 500},
+        audio: false
+    };
+    let video = document.getElementById("video");
+    let promise = navigator.mediaDevices.getUserMedia(constraints);
+    promise.then(function (MediaStream) {
+        video.srcObject = MediaStream;
+        video.play();
+    });
+}
+
+function takePhoto() {
+    let delayTimeStr = document.getElementById('delayTime').value;
+    let delayTime = parseInt(delayTimeStr);
+    if (delayTime <= 0) delayTime = 1;
+    let photoTimeStr = document.getElementById('photoTime').value;
+    let photoTime = parseInt(photoTimeStr);
+    if(photoTime < delayTime) photoTime = delayTime + 1;
+    let count = 0;
+    while (count < photoTime) {
+        photo(count);
+        delay(delayTime * 1000);
+        count = count + delayTime;
+    }
+}
+
+function delay(delayTime) {
+    let date = new Date();
+    let now = date.getTime();
+    let fu = delayTime + now;
+    while (now <= fu) {
+        now = new Date().getTime();
+    }
+}
+
+function photo(id) {
+    //todo 为什么
+    let video = document.getElementById("video");
+    let canvasId = "canvas" + id;
+    let canvas_label = "<canvas id=\"" + canvasId + "\" width=\"500px\" height=\"500px\"></canvas> <br />";
+    //alert(canvas_label);
+    document.getElementById("img_div").innerHTML=canvas_label;
+    let canvas = document.getElementById(canvasId);
+    let ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, 500, 500);
+    let img_save = canvas.toDataURL("image/jpeg");
+    downLoad(img_save);
+}
+
+function downLoad1(url) {
+    // var iframe = document.createElement('iframe');
+    // iframe.style.display = 'none';
+    // iframe.src = "javascript: '<script>location.href=\"" + url + "\"<\/script>'";
+    // document.getElementsByTagName('body')[0].appendChild(iframe);
+    var myFrame= document.createElement("iframe");
+    myFrame.src = url;
+    myFrame.style.display = "none";
+    document.body.appendChild(myFrame);
+}
+
+function downLoad(url){
+    let oA = document.createElement("a");
+    let date = new Date();
+    oA.download = 'photo_' + date.toLocaleString();
+    oA.href = url;
+    document.body.appendChild(oA);
+    oA.click();
+    //oA.hidden = true;
+    oA.remove();
+}
+</script>
+</body>
+</html>
